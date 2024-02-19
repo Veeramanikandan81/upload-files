@@ -1,0 +1,51 @@
+change folder name in line 18 
+
+
+<html>
+  <head>
+    <title>File Upload in PHP</title>
+  </head>
+  <body>
+    <form method='post' action='<?php echo $_SERVER["REQUEST_URI"];?>' enctype='multipart/form-data'>
+      <label>Select Image : </label>
+      <input type='file' name='file[]' multiple required>
+      <input type='submit' name='submit' value='Upload'>
+    </form>
+    <?php 
+      if(isset($_FILES["file"])){
+        $uploadCount=0;
+        for($i=0;$i<count($_FILES["file"]["name"]);$i++){
+          $uploadFolder="upload/";
+          $fileName=basename($_FILES["file"]["name"][$i]); //Get File Name 
+          $fileType=pathinfo($_FILES["file"]["name"][$i],PATHINFO_EXTENSION);//Get File Extension
+          $fileType=strtolower($fileType); //convert to lowercase
+          $uploadFile=rand(1000,10000).rand(1000,10000).".".$fileType; //Set File name with Random Number
+          //Check File Size greater than 300KB
+          if($_FILES["file"]["size"][$i]>300000){
+            echo $fileName." Upload Failed.File Size is too Large!!!<br>";
+          }
+          //Check File Extension
+          else if($fileType != 'jpg' && $fileType != 'jpeg'  && $fileType != 'png' && $fileType != 'gif'){
+            echo  $fileName." Upload Failed.Invalid File!!!<br>";
+          }
+          //Check Upload Folder 
+          else if(!is_dir($uploadFolder)) { 
+            echo  $fileName." Upload Failed.Upload Folder not exists!!!<br>";
+          }
+          //Check File Name
+          else if(file_exists($uploadFile)){
+            echo  $fileName." Upload Failed.File Already Exists!!!<br>";
+          }
+          //Upload File
+          else{
+            //Move file into 'upload' Folder
+            if(move_uploaded_file($_FILES["file"]["tmp_name"][$i],$uploadFolder.$uploadFile)){
+              $uploadCount++;
+            }
+          }
+        }
+        echo "<h5>".$uploadCount." File Uploaded Successfully</h5>";
+      }
+    ?>
+  </body>
+</html>
