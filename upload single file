@@ -1,0 +1,47 @@
+upload files can change your folder name in 14 line
+<html>
+  <head>
+    <title>File Upload in PHP</title>
+  </head>
+  <body>
+    <form method='post' action='<?php echo $_SERVER["REQUEST_URI"];?>' enctype='multipart/form-data'>
+      <label>Select Image : </label>
+      <input type='file' name='file' required>
+      <input type='submit' name='submit' value='Upload'>
+    </form>
+    <?php 
+      if(isset($_FILES["file"])){
+        $uploadFolder="upload/";
+        $fileName=basename($_FILES["file"]["name"]); //Get File Name 
+        $fileType=pathinfo($_FILES["file"]["name"],PATHINFO_EXTENSION);//Get File Extension
+        $fileType=strtolower($fileType); //convert to lowercase
+        $uploadFile="img".rand(1000,10000).rand(1000,10000).".".$fileType; //Set File name with Random Number
+        //Check File Size greater than 300KB
+        if($_FILES["file"]["size"]>3000000){
+          echo "Upload Failed.File Size is too Large!!!";
+        }
+        //Check File Extension
+        else if($fileType != 'jpg'&&$fileType != 'jpeg'&&$fileType != 'png' && $fileType != 'gif'){
+          echo "Upload Failed.Invalid File!!!";
+        }
+        //Check Upload Folder 
+        else if(!is_dir($uploadFolder)){
+          echo "Upload Failed.Upload Folder not exists!!!";
+        }
+        //Check File Name
+        else if(file_exists($uploadFile)){
+          echo "Upload Failed.File Already Exists!!!";
+        }
+        //Upload File
+        else{
+          //Move file into 'upload' Folder
+          if(move_uploaded_file($_FILES["file"]["tmp_name"],$uploadFolder.$uploadFile)){
+            echo "Upload Success";
+          }else{
+            echo "Upload Failed";
+          }
+        }
+      }
+    ?>
+  </body>
+</html>
